@@ -1,15 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Barna_Valentina_Lab5.Models;
 
 namespace Barna_Valentina_Lab5
@@ -28,6 +24,28 @@ namespace Barna_Valentina_Lab5
         {
             services.AddDbContext<ExpenseContext>(opt => opt.UseInMemoryDatabase("ExpenseList"));
             services.AddControllers();
+            services.AddSwaggerGen();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Expenses API",
+                    Description = "A simple example ASP.NET Core Web API",
+                    TermsOfService = new Uri("https://econ.ubbcluj.ro/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Nume Prenume",
+                        Email = string.Empty,
+                        Url = new Uri("https://econ.ubbcluj.ro/cv.php?id=540"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Use under LICX",
+                        Url = new Uri("https://econ.ubbcluj.ro/licence"),
+                    }
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,9 +54,20 @@ namespace Barna_Valentina_Lab5
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
             }
+            app.UseSwagger();
+
+            app.UseDefaultFiles();
+
+            app.UseStaticFiles();
 
             app.UseHttpsRedirection();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My Expenses APIv1.1");
+            });
 
             app.UseRouting();
 
